@@ -1,0 +1,50 @@
+name: "dlang-release"
+description: "Create a release of the repository"
+inputs:
+  token:
+    description: "Github token"
+    required: true
+  branch:
+    description: "The branch on which create a release"
+    required: false
+    default: "main"
+  is-executable:
+    description: "Whether the project builds an executable"
+    required: false
+    default: 'false'
+
+runs:
+  using: "composite"
+  steps:
+    - uses: danysk/action-checkout@0.2.1
+
+    - uses: dlang-community/setup-dlang@v1
+      with:
+        compiler: "ldc-latest"
+
+    - name: build and strip executable
+      if: ${{ inputs.is-executable }}
+      id: strip
+      run: |
+        dub build -b release
+        EXECUTABLES="$(find . -maxdepth 1 -perm -111 -type f | head -n 1)"
+        strip ${EXECUTABLES}
+        ARTIFACTS=$(echo $EXECUTABLES | sed 's/\s/,/')
+        echo "ARTIFACTS=${ARTIFACTS}" >> $GITHUB_ENV
+
+    - name: set empty artifacts
+      if: ${{ ! inputs.is-executables }}
+      run: echo "ARTIFACTS=''" >> $GITHUB_ENV
+
+    - name: "Repository next tag and changelog"
+      id: degast-metadata
+      uses: asperan/degast-action@v1
+
+    - name: create-release
+      uses: ncipollo/release-action@v1
+      with:
+        tag: "${{ steps.degast-metadata.outputs.nextTag }}"
+        commit: ${{ inputs.branch }}
+        body: "${{ steps.degast-metadata.outputs.changelog }}"
+        token: ${{ inputs.token }}
+        artifacts: "${{ env.ARTIFACTS }}"
