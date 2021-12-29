@@ -21,6 +21,9 @@ inputs:
   gpg-key-fingerprint:
     description: "The fingerprint of the key"
     required: true
+  sign-keyserver:
+    description: "The server where is hosted the key"
+    required: true
 
 runs:
   using: "composite"
@@ -52,6 +55,7 @@ runs:
         sign_key: ${{ inputs.gpg-sign-key }}
         sign_key_passphrase: ${{ inputs.gpg-key-passphrase }}
         sign_key_fingerprint: ${{ inputs.gpg-key-fingerprint }}
+        sign_keyserver: ${{ inputs.sign-keyserver}}
       
     - name: set artifacts
       if: ${{ inputs.is-executable }}
