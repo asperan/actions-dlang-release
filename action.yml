@@ -41,6 +41,7 @@ runs:
       run: |
         dub build -b release
         EXECUTABLES="$(find . -maxdepth 1 -perm -111 -type f)"
+        chmod +x ${EXECUTABLES}
         strip ${EXECUTABLES}
         echo "EXECUTABLES=${EXECUTABLES}" >> $GITHUB_ENV
 
@@ -61,7 +62,6 @@ runs:
       if: ${{ inputs.is-executable }}
       shell: bash
       run: |
-        ls
         EXECUTABLES="${{ env.EXECUTABLES }}"
         for EXE in $EXECUTABLES ; do
           find . -maxdepth 1 -iname "$EXE*" -type f -printf "%f,"
