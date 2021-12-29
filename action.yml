@@ -51,10 +51,11 @@ runs:
         checksum_output: "artifact_one_file"
         sign_key: ${{ inputs.gpg-sign-key }}
         sign_key_passphrase: ${{ inputs.gpg-key-passphrase }}
-        sign_key_fingerprint: ${{ gpg-key-fingerprint }}
+        sign_key_fingerprint: ${{ inputs.gpg-key-fingerprint }}
       
     - name: set artifacts
       if: ${{ inputs.is-executable }}
+      shell: bash
       run: |
         EXECUTABLES="${{ env.EXECUTABLES }}"
         for EXE in $EXECUTABLES; do
