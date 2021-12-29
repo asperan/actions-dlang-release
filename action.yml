@@ -65,7 +65,7 @@ runs:
         for EXE in $EXECUTABLES ; do
           ARTIFACTS="${ARTIFACTS}$(find . -maxdepth 1 -ipath "$EXE*" -type f -printf "./%f,")"; 
         done
-        echo "ARTIFACTS=${ARTIFACTS}" >> $GITHUB_ENV
+        echo "ARTIFACTS=${ARTIFACTS::-1}" >> $GITHUB_ENV
 
     - name: set empty artifacts
       if: ${{ ! inputs.is-executable }}
