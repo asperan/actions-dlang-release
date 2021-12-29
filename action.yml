@@ -43,8 +43,8 @@ runs:
 
     - name: checksum and sign artifacts
       id: checksign
-      if ${{ inputs.is-executable }}
-      uses: tristan-weil/ghaction-checksum-sign-artifact@v1
+      if: ${{ inputs.is-executable }}
+      uses: tristan-weil/ghaction-checksum-sign-artifact@v1.0.1
         with:
           path: ${{ env.EXECUTABLES }}
           checksum_digests: "sha512"
