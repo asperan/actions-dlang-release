@@ -12,6 +12,15 @@ inputs:
     description: "Whether the project builds an executable"
     required: false
     default: 'false'
+  gpg-sign-key:
+    description: "The private key to sign artifacts"
+    required: true
+  gpg-key-passphrase:
+    description: "The passphrase to unlock the private key"
+    required: true
+  gpg-key-fingerprint:
+    description: "The fingerprint of the key"
+    required: true
 
 runs:
   using: "composite"
@@ -28,9 +37,29 @@ runs:
       shell: bash
       run: |
         dub build -b release
-        EXECUTABLES="$(find . -maxdepth 1 -perm -111 -type f | head -n 1)"
+        EXECUTABLES="$(find . -maxdepth 1 -perm -111 -type f)"
         strip ${EXECUTABLES}
-        ARTIFACTS=$(echo $EXECUTABLES | sed 's/\s/,/')
+        echo "EXECUTABLES=${EXECUTABLES}" >> $GITHUB_ENV
+
+    - name: checksum and sign artifacts
+      id: checksign
+      if ${{ inputs.is-executable }}
+      uses: tristan-weil/ghaction-checksum-sign-artifact@v1
+        with:
+          path: ${{ env.EXECUTABLES }}
+          checksum_digests: "sha512"
+          checksum_output: "artifact_one_file"
+          sign_key: ${{ inputs.gpg-sign-key }}
+          sign_key_passphrase: ${{ inputs.gpg-key-passphrase }}
+          sign_key_fingerprint: ${{ gpg-key-fingerprint }}
+      
+    - name: set artifacts
+      if: ${{ inputs.is-executable }}
+      run: |
+        EXECUTABLES="${{ env.EXECUTABLES }}"
+        for EXE in $EXECUTABLES; do
+          ARTIFACTS=${ARTIFACTS}$(find . -maxdepth 1 -iname "$EXE*" -type f -printf "%f,"); 
+        done
         echo "ARTIFACTS=${ARTIFACTS}" >> $GITHUB_ENV
 
     - name: set empty artifacts
