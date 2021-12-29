@@ -61,9 +61,11 @@ runs:
       if: ${{ inputs.is-executable }}
       shell: bash
       run: |
+        ls
         EXECUTABLES="${{ env.EXECUTABLES }}"
-        for EXE in $EXECUTABLES; do
-          ARTIFACTS=${ARTIFACTS}$(find . -maxdepth 1 -iname "$EXE*" -type f -printf "%f,"); 
+        for EXE in $EXECUTABLES ; do
+          find . -maxdepth 1 -iname "$EXE*" -type f -printf "%f,"
+          ARTIFACTS="${ARTIFACTS}$(find . -maxdepth 1 -iname "$EXE*" -type f -printf "%f,")"; 
         done
         echo "ARTIFACTS=${ARTIFACTS}" >> $GITHUB_ENV
 
