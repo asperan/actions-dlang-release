@@ -34,7 +34,7 @@ runs:
         echo "ARTIFACTS=${ARTIFACTS}" >> $GITHUB_ENV
 
     - name: set empty artifacts
-      if: ${{ ! inputs.is-executables }}
+      if: ${{ ! inputs.is-executable }}
       shell: bash
       run: echo "ARTIFACTS=''" >> $GITHUB_ENV
 
