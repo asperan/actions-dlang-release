@@ -25,6 +25,7 @@ runs:
     - name: build and strip executable
       if: ${{ inputs.is-executable }}
       id: strip
+      shell: bash
       run: |
         dub build -b release
         EXECUTABLES="$(find . -maxdepth 1 -perm -111 -type f | head -n 1)"
@@ -34,6 +35,7 @@ runs:
 
     - name: set empty artifacts
       if: ${{ ! inputs.is-executables }}
+      shell: bash
       run: echo "ARTIFACTS=''" >> $GITHUB_ENV
 
     - name: "Repository next tag and changelog"
