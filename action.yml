@@ -41,7 +41,6 @@ runs:
       run: |
         dub build -b release
         EXECUTABLES="$(find . -maxdepth 1 -perm -111 -type f)"
-        chmod +x ${EXECUTABLES}
         strip ${EXECUTABLES}
         echo "EXECUTABLES=${EXECUTABLES}" >> $GITHUB_ENV
 
@@ -64,8 +63,8 @@ runs:
       run: |
         EXECUTABLES="${{ env.EXECUTABLES }}"
         for EXE in $EXECUTABLES ; do
-          find . -maxdepth 1 -iname "$EXE*" -type f -printf "%f,"
-          ARTIFACTS="${ARTIFACTS}$(find . -maxdepth 1 -iname "$EXE*" -type f -printf "%f,")"; 
+          find . -maxdepth 1 -ipath "$EXE*" -type f -printf "%f,"
+          ARTIFACTS="${ARTIFACTS}$(find . -maxdepth 1 -ipath "$EXE*" -type f -printf "%f,")"; 
         done
         echo "ARTIFACTS=${ARTIFACTS}" >> $GITHUB_ENV
 
