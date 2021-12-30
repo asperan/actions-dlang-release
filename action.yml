@@ -29,6 +29,24 @@ runs:
   using: "composite"
   steps:
     - uses: danysk/action-checkout@0.2.1
+    
+    - name: "Repository next tag and changelog"
+      id: degast-metadata
+      uses: asperan/degast-action@v1
+      
+    - name: "Import GPG key"
+      uses: crazy-max/ghaction-import-gpg@v4
+      with:
+        gpg_private_key: ${{ inputs.gpg-sign-key }}
+        passphrase: ${{ inputs.gpg-key-passphrase }}
+        git_user_signingkey: true
+        git_tag_gpgsign: true
+    
+    - name: "Create signed tag"
+      shell: bash
+      run: |
+        git tag -s -m "${{ steps.degast-metadata.outputs.nextTag }} automatic signed tag" "${{ steps.degast-metadata.outputs.nextTag }}"
+        git push --tags
 
     - uses: dlang-community/setup-dlang@v1
       with:
@@ -71,10 +89,6 @@ runs:
       if: ${{ ! inputs.is-executable }}
       shell: bash
       run: echo "ARTIFACTS=''" >> $GITHUB_ENV
-
-    - name: "Repository next tag and changelog"
-      id: degast-metadata
-      uses: asperan/degast-action@v1
 
     - name: create-release
       uses: ncipollo/release-action@v1
